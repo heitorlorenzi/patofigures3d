@@ -59,7 +59,7 @@ function setupHeroStage() {
     kratos: 'Pato Kratos: machado no ombro, armadura e a faixa vermelha.',
     mega: 'Mega Charizard X, pintado à mão. Asas azuis, corpo negro e chama na cauda.',
     gengar: 'Gengar Venom: boca aberta, dentes brancos e a língua vermelha.',
-    cubo: 'O cubo que prende o Satoru Gojo, vermelho e coberto de olhos.',
+    jesus: 'Jesus, figure com cabelo, barba e túnica.',
     furia: 'Fúria da Noite ao lado da Fúria da Luz.'
   };
 
@@ -175,10 +175,14 @@ function renderCatalog() {
   if (!grid) return;
 
   const filtered = PRODUCTS.filter(p => {
-    const matchCat = state.activeCategory === 'all' || p.category === state.activeCategory;
+    const searching = state.searchQuery.length > 0;
     const matchSearch = p.name.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
                         p.material.toLowerCase().includes(state.searchQuery.toLowerCase());
-    return matchCat && matchSearch;
+    if (!matchSearch) return false;
+    if (searching && (state.activeCategory === 'all' || state.activeCategory === 'more')) return true;
+    if (state.activeCategory === 'more') return true;
+    if (state.activeCategory === 'all') return p.featured === true;
+    return p.category === state.activeCategory;
   });
 
   if (filtered.length === 0) {
