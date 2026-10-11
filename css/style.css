@@ -271,12 +271,12 @@ body {
 }
 
 .brand-mark {
-  width: 46px;
-  height: 46px;
+  width: 56px;
+  height: 56px;
   object-fit: contain;
-  background: #ffffff;
-  border: 1px solid var(--border-light);
-  border-radius: 12px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
   flex: none;
 }
 
