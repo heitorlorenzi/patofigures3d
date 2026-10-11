@@ -689,5 +689,5 @@ const CONFIG = {
   couponDiscountPercent: 10,
   whatsappNumber: '5546988259042', // (46) 98825-9042
   whatsappDisplay: '(46) 98825-9042',
-  mercadoPagoLink: '' // Caso queira colocar um link direto do Mercado Pago
+  infiniteHandle: 'heitor-lorenzi'
 };

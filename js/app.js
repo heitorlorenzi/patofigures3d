@@ -761,63 +761,39 @@ function confirmPixPayment() {
   showSuccessModal('Pedido e Pagamento Registrados', 'Recebemos seu pedido. O comprovante foi direcionado para a equipe da Pato Figures 3D para início imediato do fatiamento!');
 }
 
-function processCardPayment(e) {
-  e.preventDefault();
-
-  const cardNumber = document.getElementById('card-number')?.value.replace(/\s+/g, '');
-  const cardName = document.getElementById('card-holder')?.value.trim();
-  const cardExpiry = document.getElementById('card-expiry')?.value.trim();
-  const cardCvv = document.getElementById('card-cvv')?.value.trim();
-  const installments = document.getElementById('card-installments')?.value || '1';
-
-  if (!cardNumber || cardNumber.length < 16) {
-    showToast('Informe um número de cartão com 16 dígitos.', 'info');
-    return;
-  }
-  if (!cardName) {
-    showToast('Informe o nome impresso no cartão.', 'info');
-    return;
-  }
-  if (!cardExpiry || cardExpiry.length < 5) {
-    showToast('Informe a validade (MM/AA).', 'info');
-    return;
-  }
-  if (!cardCvv || cardCvv.length < 3) {
-    showToast('Informe o CVV de segurança.', 'info');
+function payWithInfinitePay() {
+  const payable = state.cart.filter(item => item.price > 0 && item.quantity > 0);
+  if (!payable.length) {
+    showToast('Esse pedido ainda não tem preço fechado. Combina o valor no WhatsApp.', 'info');
     return;
   }
 
-  const btn = document.getElementById('btn-pay-card');
-  if (btn) {
-    btn.disabled = true;
-    btn.innerHTML = `Processando pagamento seguro...`;
-  }
-
-  // Notificação com dados da compra para o WhatsApp comercial
-  setTimeout(() => {
-    if (btn) {
-      btn.disabled = false;
-      btn.innerHTML = `Confirmar Pagamento com Cartão`;
+  const subtotal = payable.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const discount = state.appliedCoupon ? subtotal * (CONFIG.couponDiscountPercent / 100) : 0;
+  const total = subtotal - discount;
+  const factor = subtotal > 0 ? total / subtotal : 1;
+  const targetCents = Math.round(total * 100);
+  let used = 0;
+  const items = payable.map((item, index) => {
+    let cents = Math.max(1, Math.round(item.price * 100 * factor));
+    if (index === payable.length - 1) {
+      const rest = targetCents - used;
+      cents = Math.max(1, Math.round(rest / item.quantity));
     }
+    used += cents * item.quantity;
+    return { name: item.name, price: cents, quantity: item.quantity };
+  });
 
-    const name = document.getElementById('checkout-name')?.value.trim() || cardName;
-    const phone = document.getElementById('checkout-phone')?.value.trim() || '';
-    const address = document.getElementById('checkout-address')?.value.trim() || 'A combinar';
-    const itemsText = state.cart.map(i => `• ${i.quantity}x ${i.name}`).join('\n');
-    const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const total = subtotal - (state.appliedCoupon ? subtotal * 0.1 : 0);
+  const params = new URLSearchParams();
+  params.set('items', JSON.stringify(items));
+  params.set('order_nsu', 'PF' + Date.now().toString(36).toUpperCase());
+  params.set('redirect_url', 'https://patofigures3d.netlify.app/');
+  const name = document.getElementById('checkout-name')?.value.trim();
+  const phone = document.getElementById('checkout-phone')?.value.replace(/\D/g, '');
+  if (name) params.set('customer_name', name);
+  if (phone) params.set('customer_cellphone', phone);
 
-    const msg = `*PATOFIGURES3D - PEDIDO CARTÃO DE CRÉDITO*\n\n` +
-                `• Cliente: ${name}\n` +
-                `• Contato: ${phone}\n` +
-                `• Endereço: ${address}\n\n` +
-                `• Itens:\n${itemsText}\n\n` +
-                `• Total: ${formatBRL(total)} (${installments}x no Cartão)\n\n` +
-                `Olá! Acabei de registrar meu pedido com cartão de crédito na Pato Figures 3D!`;
-
-    window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(msg)}`, '_blank');
-    showSuccessModal('Transação no Cartão Concluída', 'Seu pedido foi registrado. Os detalhes foram encaminhados para a oficina!');
-  }, 1200);
+  window.open(`https://checkout.infinitepay.io/${CONFIG.infiniteHandle}?${params.toString()}`, '_blank', 'noopener');
 }
 
 function showSuccessModal(title, message) {
@@ -899,7 +875,7 @@ function setupEventListeners() {
 
   const cardForm = document.getElementById('card-payment-form');
   if (cardForm) {
-    cardForm.addEventListener('submit', processCardPayment);
+    cardForm.addEventListener('submit', (e) => e.preventDefault());
   }
 
   document.addEventListener('keydown', (e) => {

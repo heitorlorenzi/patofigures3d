@@ -384,7 +384,7 @@
             Pix (5% OFF)
           </button>
           <button class="payment-tab-btn" data-method="card" onclick="switchPaymentMethod('card')">
-            Cartão de Crédito
+            Cartão • InfinitePay
           </button>
         </div>
 
@@ -430,52 +430,17 @@
           </button>
         </div>
 
-        <!-- ABA CARTÃO DE CRÉDITO -->
         <div id="pane-card" style="display: none; background: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.25rem;">
-          <form id="card-payment-form" style="display: flex; flex-direction: column; gap: 0.75rem;">
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
-              <span style="font-size: 0.8rem; color: #6b7280;">Total no Cartão:</span>
-              <strong id="checkout-card-total" style="font-size: 1.15rem; color: #111827; font-weight: 700;">R$ 0,00</strong>
-            </div>
-
-            <div>
-              <label style="font-size: 0.75rem; color: #4b5563; display: flex; justify-content: space-between; margin-bottom: 0.2rem;">
-                <span>Número do Cartão</span>
-                <span id="card-brand-tag" style="font-weight: 600; color: #0284c7;">Cartão</span>
-              </label>
-              <input type="text" id="card-number" placeholder="0000 0000 0000 0000" maxlength="19" required style="width: 100%; padding: 0.65rem; font-family: monospace;">
-            </div>
-
-            <div>
-              <label style="font-size: 0.75rem; color: #4b5563; display: block; margin-bottom: 0.2rem;">Nome Impresso no Cartão</label>
-              <input type="text" id="card-holder" placeholder="NOME COMO NO CARTAO" required style="width: 100%; padding: 0.65rem; text-transform: uppercase;">
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-              <div>
-                <label style="font-size: 0.75rem; color: #4b5563; display: block; margin-bottom: 0.2rem;">Validade (MM/AA)</label>
-                <input type="text" id="card-expiry" placeholder="12/28" maxlength="5" required style="width: 100%; padding: 0.65rem;">
-              </div>
-              <div>
-                <label style="font-size: 0.75rem; color: #4b5563; display: block; margin-bottom: 0.2rem;">CVV</label>
-                <input type="password" id="card-cvv" placeholder="123" maxlength="4" required style="width: 100%; padding: 0.65rem;">
-              </div>
-            </div>
-
-            <div>
-              <label style="font-size: 0.75rem; color: #4b5563; display: block; margin-bottom: 0.2rem;">Parcelas</label>
-              <select id="card-installments" style="width: 100%; padding: 0.65rem;"></select>
-            </div>
-
-            <div style="font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;">
-              🔒 Criptografia SSL 256-bit ativa. O pedido é registrado e notificado na oficina.
-            </div>
-
-            <button type="submit" id="btn-pay-card" class="btn-primary" style="width: 100%; padding: 0.85rem; margin-top: 0.5rem;">
-              Confirmar Pagamento com Cartão
-            </button>
-          </form>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <span style="font-size: 0.8rem; color: #6b7280;">Total no cartão:</span>
+            <strong id="checkout-card-total" style="font-size: 1.15rem; color: #111827; font-weight: 700;">R$ 0,00</strong>
+          </div>
+          <p style="font-size: 0.88rem; color: #374151; line-height: 1.55; margin-bottom: 1rem;">
+            O pagamento abre na InfinitePay. Lá você parcela em até 12 vezes. O número do cartão não passa por este site. O valor cai na conta da oficina.
+          </p>
+          <button type="button" id="btn-pay-card" class="btn-primary" onclick="payWithInfinitePay()" style="width: 100%; padding: 0.85rem;">
+            Pagar com InfinitePay
+          </button>
         </div>
 
       </div>
