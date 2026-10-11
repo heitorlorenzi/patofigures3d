@@ -69,10 +69,10 @@ function setupHeroStage() {
 
         setTimeout(() => {
           if (mode === 'charizard') {
-            stageImg.src = 'assets/acervo/mega-charizard-x.jpg?v=2';
+            stageImg.src = 'assets/acervo/mega-charizard-x.jpg?v=3';
             if (stageCaption) stageCaption.textContent = 'Mega Charizard X, pintado à mão. Asas azuis, corpo negro e chama na cauda.';
           } else {
-            stageImg.src = 'assets/acervo/pato-barbaro.jpg?v=2';
+            stageImg.src = 'assets/acervo/pato-barbaro.jpg?v=3';
             if (stageCaption) stageCaption.textContent = 'Patolino Bárbaro: o pato dos desenhos, de machado e armadura.';
           }
           stageImg.style.opacity = '1';
