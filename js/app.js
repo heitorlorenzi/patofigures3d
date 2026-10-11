@@ -68,12 +68,12 @@ function setupHeroStage() {
         stageImg.style.transition = 'all 0.2s ease';
 
         setTimeout(() => {
-          if (mode === 'macro') {
-            stageImg.src = 'assets/duck_macro.jpg';
-            if (stageCaption) stageCaption.textContent = 'Macro 0.12mm: camadas microscópicas reais e acabamento fosco suave.';
+          if (mode === 'charizard') {
+            stageImg.src = 'assets/acervo/mega-charizard-x.jpg';
+            if (stageCaption) stageCaption.textContent = 'Mega Charizard X, pintado à mão. Asas azuis, corpo negro e chama na cauda.';
           } else {
-            stageImg.src = 'assets/duck_companion.jpg';
-            if (stageCaption) stageCaption.textContent = 'Mascote Pato impresso em bancada real com vasinho geométrico.';
+            stageImg.src = 'assets/acervo/pato-barbaro.jpg';
+            if (stageCaption) stageCaption.textContent = 'Patolino Bárbaro: o pato dos desenhos, de machado e armadura.';
           }
           stageImg.style.opacity = '1';
           stageImg.style.transform = 'scale(1)';
@@ -129,7 +129,10 @@ function renderCatalog() {
   }
 
   grid.innerHTML = filtered.map((p, index) => {
-    const pixPrice = p.price * 0.95;
+    const consult = p.price == null;
+    const pixPrice = consult ? null : p.price * (1 - (CONFIG.pixDiscountPercent || 5) / 100);
+    const waText = encodeURIComponent(`Olá! Quero encomendar na Pato Figures 3D: ${p.name}`);
+    const wa = `https://wa.me/${CONFIG.whatsappNumber}?text=${waText}`;
     return `
       <div class="editorial-card reveal-on-scroll" style="transition-delay: ${index * 50}ms;">
         <div class="card-media" style="cursor: pointer;" onclick="openProductModal('${p.id}')">
@@ -145,7 +148,7 @@ function renderCatalog() {
         <div style="padding: 1.5rem; display: flex; flex-direction: column; flex: 1;">
           
           <div style="font-size: 0.75rem; color: #6b7280; font-weight: 500; margin-bottom: 0.25rem;">
-            ${p.material.split('(')[0]} • ${p.layerHeight.split(' ')[0]}
+            ${p.categoryName} • ${p.material.split('(')[0]}
           </div>
 
           <h3 style="font-size: 1.15rem; font-weight: 600; color: #111827; margin-bottom: 0.5rem; cursor: pointer; letter-spacing: -0.01em;" onclick="openProductModal('${p.id}')">
@@ -158,17 +161,19 @@ function renderCatalog() {
 
           <div style="margin-top: auto; display: flex; align-items: baseline; justify-content: space-between; padding-top: 1rem; border-top: 1px solid #f3f4f6; margin-bottom: 1rem;">
             <div>
-              <span style="font-size: 1.25rem; font-weight: 700; color: #111827;">${formatBRL(p.price)}</span>
+              ${consult
+                ? `<span style="font-size: 1.15rem; font-weight: 700; color: #111827;">Sob consulta</span>`
+                : `<span style="font-size: 1.25rem; font-weight: 700; color: #111827;">${formatBRL(p.price)}</span>`}
             </div>
             <span style="font-size: 0.8rem; color: #16a34a; font-weight: 600;">
-              ${formatBRL(pixPrice)} no Pix
+              ${consult ? 'Encomenda' : `${formatBRL(pixPrice)} no Pix`}
             </span>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr auto; gap: 0.5rem;">
-            <button onclick="addToCart('${p.id}')" class="btn-primary" style="padding: 0.65rem 1rem;">
-              Adicionar ao Carrinho
-            </button>
+            ${consult
+              ? `<a href="${wa}" target="_blank" class="btn-primary" style="padding: 0.65rem 1rem;">Pedir no WhatsApp</a>`
+              : `<button onclick="addToCart('${p.id}')" class="btn-primary" style="padding: 0.65rem 1rem;">Adicionar ao Carrinho</button>`}
             <button onclick="openProductModal('${p.id}')" class="btn-secondary" style="padding: 0.65rem 0.9rem;" title="Ver detalhes">
               Ver
             </button>
@@ -196,6 +201,11 @@ function resetFilters() {
 function addToCart(productId, quantity = 1, openDrawerAfter = true) {
   const product = PRODUCTS.find(p => p.id === productId);
   if (!product) return;
+  if (product.price == null) {
+    const waText = encodeURIComponent(`Olá! Quero encomendar na Pato Figures 3D: ${product.name}`);
+    window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${waText}`, '_blank');
+    return;
+  }
 
   const existingIndex = state.cart.findIndex(item => item.id === productId);
   if (existingIndex > -1) {
@@ -219,6 +229,12 @@ function addToCart(productId, quantity = 1, openDrawerAfter = true) {
 }
 
 function buyNow(productId) {
+  const product = PRODUCTS.find(p => p.id === productId);
+  if (product && product.price == null) {
+    const waText = encodeURIComponent(`Olá! Quero encomendar na Pato Figures 3D: ${product.name}`);
+    window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${waText}`, '_blank');
+    return;
+  }
   addToCart(productId, 1, false);
   closeProductModal();
   openCheckoutModal();
@@ -358,14 +374,19 @@ function openProductModal(productId) {
   const body = document.getElementById('product-modal-body');
   if (!modal || !body) return;
 
-  const pixPrice = product.price * 0.95;
+  const consult = product.price == null;
+  const pixPrice = consult ? null : product.price * (1 - (CONFIG.pixDiscountPercent || 5) / 100);
+  const shots = [product.image].concat(product.gallery || []);
+  const waText = encodeURIComponent(`Olá! Quero encomendar na Pato Figures 3D: ${product.name}`);
+  const wa = `https://wa.me/${CONFIG.whatsappNumber}?text=${waText}`;
 
   body.innerHTML = `
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2.5rem;">
       <div>
-        <div style="border-radius: 8px; overflow: hidden; border: 1px solid #e5e7eb; margin-bottom: 1rem; background: #f3f4f6;">
-          <img src="${product.image}" alt="${product.name}" style="width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block;">
+        <div style="border-radius: 8px; overflow: hidden; border: 1px solid #e5e7eb; margin-bottom: 0.75rem; background: #f4f1ec;">
+          <img id="modal-shot" src="${product.image}" alt="${product.name}" style="width: 100%; aspect-ratio: 1/1; object-fit: contain; background: #f4f1ec; display: block;">
         </div>
+        ${shots.length > 1 ? `<div style="display: flex; gap: 0.5rem;">${shots.map((src) => `<button type="button" onclick="document.getElementById('modal-shot').src='${src}'" style="padding: 0; border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden; width: 68px; height: 68px; background: #f4f1ec; cursor: pointer;"><img src="${src}" alt="" style="width: 100%; height: 100%; object-fit: contain;"></button>`).join('')}</div>` : ''}
       </div>
 
       <div style="display: flex; flex-direction: column;">
@@ -378,10 +399,9 @@ function openProductModal(productId) {
         </h2>
 
         <div style="display: flex; align-items: baseline; gap: 0.75rem; margin-bottom: 1.25rem;">
-          <span style="font-size: 1.6rem; font-weight: 700; color: #111827;">${formatBRL(product.price)}</span>
-          <span style="font-size: 0.85rem; color: #16a34a; font-weight: 600;">
-            ${formatBRL(pixPrice)} no Pix
-          </span>
+          ${consult
+            ? `<span style="font-size: 1.45rem; font-weight: 700; color: #111827;">Sob consulta</span><span style="font-size: 0.85rem; color: #6b7280;">o valor combina no WhatsApp</span>`
+            : `<span style="font-size: 1.6rem; font-weight: 700; color: #111827;">${formatBRL(product.price)}</span><span style="font-size: 0.85rem; color: #16a34a; font-weight: 600;">${formatBRL(pixPrice)} no Pix</span>`}
         </div>
 
         <p style="color: #4b5563; font-size: 0.92rem; line-height: 1.6; margin-bottom: 1.5rem;">
@@ -410,17 +430,13 @@ function openProductModal(productId) {
         </div>
 
         <div style="margin-top: auto; display: flex; flex-direction: column; gap: 0.5rem;">
-          <button onclick="buyNow('${product.id}')" class="btn-accent" style="width: 100%; padding: 0.8rem;">
-            Comprar Agora (Direto para Pagamento)
-          </button>
+          ${consult
+            ? `<a href="${wa}" target="_blank" class="btn-accent" style="width: 100%; padding: 0.8rem;">Pedir este modelo no WhatsApp</a>`
+            : `<button onclick="buyNow('${product.id}')" class="btn-accent" style="width: 100%; padding: 0.8rem;">Comprar Agora (Direto para Pagamento)</button>
           <div style="display: flex; gap: 0.5rem;">
-            <button onclick="addToCart('${product.id}'); closeProductModal();" class="btn-secondary" style="flex: 1; padding: 0.7rem;">
-              Adicionar à Sacola
-            </button>
-            <a href="https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(`Olá! Gostaria de encomendar a peça com a Pato Figures 3D: ${product.name}`)}" target="_blank" class="btn-secondary" style="padding: 0.7rem;">
-              WhatsApp
-            </a>
-          </div>
+            <button onclick="addToCart('${product.id}'); closeProductModal();" class="btn-secondary" style="flex: 1; padding: 0.7rem;">Adicionar à Sacola</button>
+            <a href="${wa}" target="_blank" class="btn-secondary" style="padding: 0.7rem;">WhatsApp</a>
+          </div>`}
         </div>
       </div>
     </div>
