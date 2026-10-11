@@ -639,6 +639,21 @@ textarea:focus {
   gap: 2rem;
 }
 
+.checkout-person {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  input, select, textarea { font-size: 16px; }
+  .checkout-person { grid-template-columns: 1fr; }
+  #product-modal > div,
+  #checkout-modal > div,
+  #success-modal > div { padding: 1.25rem 1rem; }
+  #toast-container { left: 1rem; right: 1rem; }
+}
 @media (max-width: 768px) {
   .hero-layout {
     grid-template-columns: 1fr !important;

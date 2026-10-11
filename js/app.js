@@ -1,7 +1,7 @@
 // PatoFigures3D - Interatividade, Carrinho & Pagamento Seguro Real
 
 const state = {
-  cart: JSON.parse(localStorage.getItem('patofigures_cart')) || [],
+  cart: loadCart(),
   appliedCoupon: null,
   activeCategory: 'all',
   showAll: false,
@@ -19,6 +19,32 @@ document.addEventListener('DOMContentLoaded', () => {
   setupScrollProgress();
 });
 
+function loadCart() {
+  try {
+    const raw = JSON.parse(localStorage.getItem('patofigures_cart') || '[]');
+    if (!Array.isArray(raw)) return [];
+    return raw.filter(item => item && typeof item.name === 'string' && Number(item.price) > 0).map(item => ({
+      id: String(item.id || '').replace(/[^\w-]/g, '').slice(0, 80),
+      name: String(item.name).slice(0, 120),
+      price: Number(item.price),
+      image: typeof item.image === 'string' && item.image.startsWith('assets/') ? item.image : '',
+      material: typeof item.material === 'string' ? item.material.slice(0, 80) : '',
+      quantity: Math.min(99, Math.max(1, Math.round(Number(item.quantity) || 1)))
+    })).filter(item => item.id);
+  } catch {
+    return [];
+  }
+}
+
+function esc(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function saveCart() {
   localStorage.setItem('patofigures_cart', JSON.stringify(state.cart));
   updateCartUI();
@@ -35,7 +61,8 @@ function showToast(message, type = 'info') {
   if (type === 'success') dot = '<span style="color: #16a34a; font-size: 0.8rem;">✓</span>';
   if (type === 'cart') dot = '<span style="color: #ea580c; font-size: 0.8rem;">🛒</span>';
 
-  toast.innerHTML = `${dot}<span>${message}</span>`;
+  toast.innerHTML = `${dot}<span></span>`;
+  toast.querySelector('span').textContent = message;
   container.appendChild(toast);
 
   setTimeout(() => {
@@ -110,7 +137,7 @@ function shotStageHtml(shots, alt) {
   const many = shots.length > 1;
   const firstLabel = shots[0].label ? `${shots[0].label} · 1/${shots.length}` : '';
   const frames = shots.map((shot, i) =>
-    `<img class="${i === 0 ? 'is-on' : ''}" src="${shot.src}" alt="${alt}${shot.label ? ' — ' + shot.label : ''}" decoding="async">`
+    `<img class="${i === 0 ? 'is-on' : ''}" src="${esc(shot.src)}" alt="${esc(alt)}${shot.label ? ' — ' + esc(shot.label) : ''}" decoding="async">`
   ).join('');
   return `
     <div class="shot-stage" data-index="0">
@@ -118,7 +145,7 @@ function shotStageHtml(shots, alt) {
       ${many ? `
         <button type="button" class="shot-nav prev" onclick="stepShot(event, this, -1)" aria-label="Foto anterior">‹</button>
         <button type="button" class="shot-nav next" onclick="stepShot(event, this, 1)" aria-label="Próxima foto">›</button>
-        <span class="shot-label">${firstLabel}</span>
+        <span class="shot-label">${esc(firstLabel)}</span>
       ` : ''}
     </div>
   `;
@@ -238,7 +265,7 @@ function renderCatalog() {
 
           <div style="display: grid; grid-template-columns: 1fr auto; gap: 0.5rem;">
             ${consult
-              ? `<a href="${wa}" target="_blank" class="btn-primary" style="padding: 0.65rem 1rem;">Pedir no WhatsApp</a>`
+              ? `<a href="${wa}" target="_blank" rel="noopener noreferrer" class="btn-primary" style="padding: 0.65rem 1rem;">Pedir no WhatsApp</a>`
               : `<button onclick="addToCart('${p.id}')" class="btn-primary" style="padding: 0.65rem 1rem;">Adicionar ao Carrinho</button>`}
             <button onclick="openProductModal('${p.id}')" class="btn-secondary" style="padding: 0.65rem 0.9rem;" title="Ver detalhes">
               Ver
@@ -284,7 +311,7 @@ function addToCart(productId, quantity = 1, openDrawerAfter = true) {
   if (!product) return;
   if (product.price == null) {
     const waText = encodeURIComponent(`Olá! Quero encomendar na Pato Figures 3D: ${product.name}`);
-    window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${waText}`, '_blank');
+    window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${waText}`, '_blank', 'noopener,noreferrer');
     return;
   }
 
@@ -313,7 +340,7 @@ function buyNow(productId) {
   const product = PRODUCTS.find(p => p.id === productId);
   if (product && product.price == null) {
     const waText = encodeURIComponent(`Olá! Quero encomendar na Pato Figures 3D: ${product.name}`);
-    window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${waText}`, '_blank');
+    window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${waText}`, '_blank', 'noopener,noreferrer');
     return;
   }
   addToCart(productId, 1, false);
@@ -366,21 +393,21 @@ function updateCartUI() {
 
   drawerItems.innerHTML = state.cart.map(item => `
     <div style="display: flex; gap: 1rem; padding: 1.25rem; border-bottom: 1px solid #f3f4f6; align-items: center;">
-      <img src="${item.image}" alt="${item.name}" style="width: 56px; height: 56px; object-fit: cover; border-radius: 6px; border: 1px solid #e5e7eb;">
+      <img src="${esc(item.image)}" alt="${esc(item.name)}" style="width: 56px; height: 56px; object-fit: cover; border-radius: 6px; border: 1px solid #e5e7eb;">
       <div style="flex: 1;">
-        <h4 style="font-size: 0.92rem; font-weight: 600; color: #111827; margin-bottom: 0.2rem;">${item.name}</h4>
-        <span style="font-size: 0.75rem; color: #6b7280; display: block; margin-bottom: 0.5rem;">${item.material.split('(')[0]}</span>
+        <h4 style="font-size: 0.92rem; font-weight: 600; color: #111827; margin-bottom: 0.2rem;">${esc(item.name)}</h4>
+        <span style="font-size: 0.75rem; color: #6b7280; display: block; margin-bottom: 0.5rem;">${esc(item.material.split('(')[0])}</span>
         
         <div style="display: flex; align-items: center; justify-content: space-between;">
           <div style="display: inline-flex; align-items: center; border: 1px solid #e5e7eb; border-radius: 4px; background: #fff;">
-            <button onclick="updateQuantity('${item.id}', -1)" style="padding: 0.2rem 0.5rem; background: none; border: none; cursor: pointer; color: #111827; font-weight: bold;">-</button>
+            <button onclick="updateQuantity('${esc(item.id)}', -1)" style="padding: 0.2rem 0.5rem; background: none; border: none; cursor: pointer; color: #111827; font-weight: bold;">-</button>
             <span style="padding: 0.2rem 0.4rem; font-size: 0.85rem; font-weight: 500; min-width: 20px; text-align: center;">${item.quantity}</span>
-            <button onclick="updateQuantity('${item.id}', 1)" style="padding: 0.2rem 0.5rem; background: none; border: none; cursor: pointer; color: #111827; font-weight: bold;">+</button>
+            <button onclick="updateQuantity('${esc(item.id)}', 1)" style="padding: 0.2rem 0.5rem; background: none; border: none; cursor: pointer; color: #111827; font-weight: bold;">+</button>
           </div>
           <span style="font-weight: 600; color: #111827; font-size: 0.95rem;">${formatBRL(item.price * item.quantity)}</span>
         </div>
       </div>
-      <button onclick="removeFromCart('${item.id}')" style="background: none; border: none; color: #9ca3af; cursor: pointer; padding: 0.3rem;" title="Remover" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#9ca3af'">
+      <button onclick="removeFromCart('${esc(item.id)}')" style="background: none; border: none; color: #9ca3af; cursor: pointer; padding: 0.3rem;" title="Remover">
         ✕
       </button>
     </div>
@@ -511,11 +538,11 @@ function openProductModal(productId) {
 
         <div style="margin-top: auto; display: flex; flex-direction: column; gap: 0.5rem;">
           ${consult
-            ? `<a href="${wa}" target="_blank" class="btn-accent" style="width: 100%; padding: 0.8rem;">Pedir este modelo no WhatsApp</a>`
+            ? `<a href="${wa}" target="_blank" rel="noopener noreferrer" class="btn-accent" style="width: 100%; padding: 0.8rem;">Pedir este modelo no WhatsApp</a>`
             : `<button onclick="buyNow('${product.id}')" class="btn-accent" style="width: 100%; padding: 0.8rem;">Comprar Agora (Direto para Pagamento)</button>
           <div style="display: flex; gap: 0.5rem;">
             <button onclick="addToCart('${product.id}'); closeProductModal();" class="btn-secondary" style="flex: 1; padding: 0.7rem;">Adicionar à Sacola</button>
-            <a href="${wa}" target="_blank" class="btn-secondary" style="padding: 0.7rem;">WhatsApp</a>
+            <a href="${wa}" target="_blank" rel="noopener noreferrer" class="btn-secondary" style="padding: 0.7rem;">WhatsApp</a>
           </div>`}
         </div>
       </div>
@@ -553,7 +580,7 @@ function setupQuoteConfigurator() {
                 `• Arquivo ou Link: ${link}\n\n` +
                 `Pode verificar a viabilidade para mim?`;
 
-    window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+    window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
   });
 }
 
@@ -757,7 +784,7 @@ function confirmPixPayment() {
               `• Chave: ${CONFIG.pixKey}\n\n` +
               `Olá! Realizei o Pix para a Pato Figures 3D. Segue meu comprovante para início da produção.`;
 
-  window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+  window.open(`https://wa.me/${CONFIG.whatsappNumber}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
   showSuccessModal('Pedido e Pagamento Registrados', 'Recebemos seu pedido. O comprovante foi direcionado para a equipe da Pato Figures 3D para início imediato do fatiamento!');
 }
 
@@ -793,7 +820,7 @@ function payWithInfinitePay() {
   if (name) params.set('customer_name', name);
   if (phone) params.set('customer_cellphone', phone);
 
-  window.open(`https://checkout.infinitepay.io/${CONFIG.infiniteHandle}?${params.toString()}`, '_blank', 'noopener');
+  window.open(`https://checkout.infinitepay.io/${CONFIG.infiniteHandle}?${params.toString()}`, '_blank', 'noopener,noreferrer');
 }
 
 function showSuccessModal(title, message) {
