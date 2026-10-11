@@ -364,6 +364,12 @@ body {
   font-weight: 600;
 }
 
+.cat-pill-more {
+  border: 1px solid #111827;
+  color: #111827;
+  font-weight: 600;
+}
+
 /* Animação Suave ao Rolar */
 .reveal-on-scroll {
   opacity: 1;

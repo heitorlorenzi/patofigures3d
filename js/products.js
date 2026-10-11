@@ -192,7 +192,7 @@ const PRODUCTS = [
   },
   {
     id: 'polvo-articulado',
-    featured: false,
+    featured: true,
     name: 'Polvo Articulado',
     category: 'articulados',
     categoryName: 'Articulados',

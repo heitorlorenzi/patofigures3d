@@ -176,10 +176,13 @@ function renderCatalog() {
   if (!grid) return;
 
   const filtered = PRODUCTS.filter(p => {
-    const matchCat = state.activeCategory === 'all' || state.activeCategory === 'more' || p.category === state.activeCategory;
     const matchSearch = p.name.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
                         p.material.toLowerCase().includes(state.searchQuery.toLowerCase());
-    return matchCat && matchSearch;
+    if (!matchSearch) return false;
+    if (state.searchQuery.length > 0 && (state.activeCategory === 'all' || state.activeCategory === 'more')) return true;
+    if (state.activeCategory === 'more') return true;
+    if (state.activeCategory === 'all') return p.featured === true;
+    return p.category === state.activeCategory;
   });
 
   if (filtered.length === 0) {
