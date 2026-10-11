@@ -57,6 +57,7 @@ function setupHeroStage() {
   const lensButtons = document.querySelectorAll('.stage-lens-btn');
   const captions = {
     kratos: 'Pato Kratos: machado no ombro, armadura e a faixa vermelha.',
+    polvo: 'Polvo articulado: tentáculos em gomos que dobram, já sai pronto da impressora.',
     mega: 'Mega Charizard X, pintado à mão. Asas azuis, corpo negro e chama na cauda.',
     gengar: 'Gengar Venom: boca aberta, dentes brancos e a língua vermelha.',
     jesus: 'Jesus, figure com cabelo, barba e túnica.',
@@ -175,14 +176,10 @@ function renderCatalog() {
   if (!grid) return;
 
   const filtered = PRODUCTS.filter(p => {
-    const searching = state.searchQuery.length > 0;
+    const matchCat = state.activeCategory === 'all' || state.activeCategory === 'more' || p.category === state.activeCategory;
     const matchSearch = p.name.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
                         p.material.toLowerCase().includes(state.searchQuery.toLowerCase());
-    if (!matchSearch) return false;
-    if (searching && (state.activeCategory === 'all' || state.activeCategory === 'more')) return true;
-    if (state.activeCategory === 'more') return true;
-    if (state.activeCategory === 'all') return p.featured === true;
-    return p.category === state.activeCategory;
+    return matchCat && matchSearch;
   });
 
   if (filtered.length === 0) {
