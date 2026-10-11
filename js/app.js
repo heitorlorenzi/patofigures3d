@@ -4,6 +4,7 @@ const state = {
   cart: JSON.parse(localStorage.getItem('patofigures_cart')) || [],
   appliedCoupon: null,
   activeCategory: 'all',
+  showAll: false,
   searchQuery: '',
   pixTimerSeconds: 15 * 60,
   pixInterval: null
@@ -179,9 +180,8 @@ function renderCatalog() {
     const matchSearch = p.name.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
                         p.material.toLowerCase().includes(state.searchQuery.toLowerCase());
     if (!matchSearch) return false;
-    if (state.searchQuery.length > 0 && (state.activeCategory === 'all' || state.activeCategory === 'more')) return true;
-    if (state.activeCategory === 'more') return true;
-    if (state.activeCategory === 'all') return p.featured === true;
+    if (state.searchQuery.length > 0 && state.activeCategory === 'all') return true;
+    if (state.activeCategory === 'all') return state.showAll || p.featured === true;
     return p.category === state.activeCategory;
   });
 
@@ -250,11 +250,26 @@ function renderCatalog() {
     `;
   }).join('');
 
+  if (state.activeCategory === 'all' && !state.showAll && state.searchQuery.length === 0) {
+    const rest = PRODUCTS.length - filtered.length;
+    grid.insertAdjacentHTML('beforeend', `
+      <div class="catalog-more">
+        <button type="button" id="btn-ver-mais" class="btn-primary">Ver mais</button>
+        <p>Abre o acervo inteiro, mais ${rest} modelos.</p>
+      </div>
+    `);
+    document.getElementById('btn-ver-mais').addEventListener('click', () => {
+      state.showAll = true;
+      renderCatalog();
+    });
+  }
+
   bindSwipes();
 }
 
 function resetFilters() {
   state.activeCategory = 'all';
+  state.showAll = false;
   state.searchQuery = '';
   const searchInput = document.getElementById('search-input');
   if (searchInput) searchInput.value = '';
@@ -834,6 +849,7 @@ function setupEventListeners() {
       document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       state.activeCategory = btn.dataset.category;
+      if (btn.dataset.category === 'all') state.showAll = false;
       renderCatalog();
     });
   });

@@ -63,7 +63,7 @@ const PRODUCTS = [
   },
   {
     id: 'linha-eeveelutions',
-    featured: true,
+    featured: false,
     name: 'Eeveelutions',
     category: 'figures',
     categoryName: 'Figures',
@@ -353,7 +353,7 @@ const PRODUCTS = [
   },
   {
     id: 'chaveiro-cambio',
-    featured: true,
+    featured: false,
     name: 'Chaveiro Câmbio',
     category: 'utilidades',
     categoryName: 'Utilidades',
@@ -372,7 +372,7 @@ const PRODUCTS = [
   },
   {
     id: 'chaveiro-motor',
-    featured: true,
+    featured: false,
     name: 'Chaveiro Motor',
     category: 'utilidades',
     categoryName: 'Utilidades',
@@ -391,7 +391,7 @@ const PRODUCTS = [
   },
   {
     id: 'chaveiro-tnt',
-    featured: true,
+    featured: false,
     name: 'Chaveiro TNT',
     category: 'utilidades',
     categoryName: 'Utilidades',
