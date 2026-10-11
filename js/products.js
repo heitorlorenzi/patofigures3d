@@ -679,7 +679,7 @@ const PRODUCTS = [
 // Configurações Oficiais da Loja
 const CONFIG = {
   brandName: 'Pato Figures 3D',
-  tagline: 'Action Figures & Soluções em Impressão 3D',
+  tagline: 'Action figures, miniaturas, brinquedos e acessórios',
   // Chave Pix Oficial Atualizada
   pixKey: 'patofigures3d@gmail.com',
   pixReceiverName: 'PATOFIGURES3D',
