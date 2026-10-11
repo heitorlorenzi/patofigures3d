@@ -8,8 +8,8 @@
   <meta name="description" content="Action figures colecionáveis e peças sob medida com acabamento de alta resolução em impressão 3D FDM.">
   <meta name="theme-color" content="#ffffff">
   
-  <link rel="icon" type="image/png" href="assets/favicon.png">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="assets/favicon.png?v=7">
+  <link rel="stylesheet" href="css/style.css?v=7">
   
   <style>
     .payment-tab-btn {
@@ -43,7 +43,7 @@
     <div class="container" style="display: flex; align-items: center; justify-content: space-between;">
       
       <a href="#" class="brand">
-        <img class="brand-mark" src="assets/mascot.png?v=6" alt="Pato da PatoFigures3D">
+        <img class="brand-mark" src="assets/mascot.png?v=7" alt="Pato da PatoFigures3D">
         <span class="brand-name">PatoFigures<span>3D</span></span>
       </a>
 
@@ -181,62 +181,41 @@
   </section>
 
   <!-- ================= ENCOMENDA SOB MEDIDA (BESPOKE REQUEST) ================= -->
-  <section id="sob-medida" style="padding: 5rem 0; background: #fafafa; border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb;">
-    <div class="container" style="max-width: 860px;">
-      
-      <div class="reveal-on-scroll" style="text-align: center; margin-bottom: 3rem;">
-        <span style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; color: #ea580c; font-weight: 600; display: block; margin-bottom: 0.5rem;">
-          Sob Medida
-        </span>
-        <h2 style="font-size: 2.2rem; font-weight: 800; letter-spacing: -0.02em; color: #111827; margin-bottom: 0.75rem;">
-          Tem um arquivo 3D ou uma ideia própria?
-        </h2>
-        <p style="color: #4b5563; font-size: 1rem; max-width: 560px; margin: 0 auto;">
-          Analisamos a geometria do seu modelo gratuitamente e enviamos a estimativa de tempo e custo sem compromisso.
-        </p>
+  <section id="sob-medida" class="commission">
+    <div class="commission-wrap">
+      <div class="commission-copy">
+        <span class="commission-kicker">Sob encomenda</span>
+        <h2>Seu arquivo.<br>A oficina devolve o preço.</h2>
+        <p>Manda o STL, o 3MF ou só uma foto da ideia. A gente olha o tamanho, o suporte e a parede, e responde com o tempo e o valor. Nada entra na impressora antes do seu ok.</p>
+        <ol class="commission-steps">
+          <li><span>01</span><div><strong>Você manda</strong><em>Arquivo ou uma foto do que quer.</em></div></li>
+          <li><span>02</span><div><strong>A oficina fatia</strong><em>Gramas, horas e o preço no WhatsApp.</em></div></li>
+          <li><span>03</span><div><strong>Você aprova</strong><em>Só imprime depois da sua confirmação.</em></div></li>
+        </ol>
       </div>
 
-      <div class="reveal-on-scroll" style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);">
-        <form style="display: flex; flex-direction: column; gap: 1.5rem;">
-          
+      <form class="commission-form" onsubmit="return false;">
+        <div>
+          <label for="quote-idea">A peça</label>
+          <input type="text" id="quote-idea" placeholder="Figure de 18 cm, suporte de headset, peça de reposição…">
+        </div>
+        <div class="commission-fields">
           <div>
-            <label style="font-size: 0.85rem; font-weight: 600; color: #111827; display: block; margin-bottom: 0.4rem;">
-              Qual é a sua ideia ou peça?
-            </label>
-            <input type="text" id="quote-idea" placeholder="Ex: Action figure do Goku em 20cm, ou suporte para headset..." style="width: 100%; padding: 0.75rem;">
+            <label for="quote-material">Filamento</label>
+            <select id="quote-material">
+              <option value="pla_silk">PLA Silk, com brilho</option>
+              <option value="pla_premium">PLA+ fosco</option>
+              <option value="petg">PETG, mais resistente</option>
+            </select>
           </div>
-
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-            <div>
-              <label style="font-size: 0.85rem; font-weight: 600; color: #111827; display: block; margin-bottom: 0.4rem;">
-                Filamento Preferido
-              </label>
-              <select id="quote-material" style="width: 100%; padding: 0.75rem;">
-                <option value="pla_silk">PLA Silk (Brilho metálico/sedoso)</option>
-                <option value="pla_premium">PLA+ Fosco (Alta rigidez)</option>
-                <option value="petg">PETG Resistente (Resiste a calor e impacto)</option>
-              </select>
-            </div>
-
-            <div>
-              <label style="font-size: 0.85rem; font-weight: 600; color: #111827; display: block; margin-bottom: 0.4rem;">
-                Link do Modelo ou Arquivo
-              </label>
-              <input type="text" id="quote-link" placeholder="Thingiverse, Printables ou Drive..." style="width: 100%; padding: 0.75rem;">
-            </div>
+          <div>
+            <label for="quote-link">Arquivo</label>
+            <input type="text" id="quote-link" placeholder="Drive, Printables ou Thingiverse">
           </div>
-
-          <button id="btn-send-quote" class="btn-accent" style="padding: 0.9rem; font-size: 0.95rem; width: 100%;">
-            Enviar Projeto para o WhatsApp da Oficina
-          </button>
-
-          <span style="font-size: 0.78rem; color: #6b7280; text-align: center;">
-            Resposta direta com análise de espessura de paredes e viabilidade de fatiamento.
-          </span>
-
-        </form>
-      </div>
-
+        </div>
+        <button id="btn-send-quote" class="btn-accent" type="button">Pedir orçamento no WhatsApp</button>
+        <p class="commission-note">Olhar o arquivo não tem custo. A resposta sai no WhatsApp da oficina.</p>
+      </form>
     </div>
   </section>
 
