@@ -224,12 +224,21 @@ body {
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.06);
 }
 
+.stage-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.85rem 1rem 0;
+  background: #ffffff;
+  border-top: 1px solid var(--border-subtle);
+}
+
 .stage-lens-btn {
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
+  background: #ffffff;
   border: 1px solid var(--border-light);
   color: var(--text-body);
-  padding: 0.45rem 0.85rem;
+  padding: 0.45rem 0.8rem;
+  min-height: 40px;
   border-radius: 9999px;
   font-size: 0.78rem;
   font-weight: 500;

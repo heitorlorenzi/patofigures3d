@@ -55,30 +55,48 @@ function setupHeroStage() {
   const stageImg = document.getElementById('hero-stage-image');
   const stageCaption = document.getElementById('hero-stage-caption');
   const lensButtons = document.querySelectorAll('.stage-lens-btn');
+  const slides = {
+    kratos: {
+      src: 'assets/acervo/pato-barbaro.jpg?v=3',
+      alt: 'Pato Kratos impresso em 3D',
+      caption: 'Pato Kratos: machado no ombro, armadura e a faixa vermelha.'
+    },
+    mega: {
+      src: 'assets/acervo/mega-charizard-x.jpg?v=3',
+      alt: 'Mega Charizard X impresso em 3D',
+      caption: 'Mega Charizard X, pintado à mão. Asas azuis, corpo negro e chama na cauda.'
+    },
+    gengar: {
+      src: 'assets/acervo/gengar-venom.jpg?v=3',
+      alt: 'Gengar Venom impresso em 3D',
+      caption: 'Gengar Venom: boca aberta, dentes brancos e a língua vermelha.'
+    },
+    cubo: {
+      src: 'assets/acervo/cubo-olhos.jpg?v=3',
+      alt: 'Cubo do Satoru Gojo impresso em 3D',
+      caption: 'O cubo que prende o Satoru Gojo, vermelho e coberto de olhos.'
+    },
+    furia: {
+      src: 'assets/acervo/furia-banguela.jpg?v=3',
+      alt: 'Fúria da Noite impressa em 3D',
+      caption: 'Fúria da Noite ao lado da Fúria da Luz.'
+    }
+  };
 
   lensButtons.forEach(btn => {
     btn.addEventListener('click', () => {
+      const slide = slides[btn.dataset.mode];
+      if (!slide || !stageImg) return;
       lensButtons.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-
-      const mode = btn.dataset.mode;
-      if (stageImg) {
-        stageImg.style.opacity = '0.3';
-        stageImg.style.transform = 'scale(0.98)';
-        stageImg.style.transition = 'all 0.2s ease';
-
-        setTimeout(() => {
-          if (mode === 'charizard') {
-            stageImg.src = 'assets/acervo/mega-charizard-x.jpg?v=3';
-            if (stageCaption) stageCaption.textContent = 'Mega Charizard X, pintado à mão. Asas azuis, corpo negro e chama na cauda.';
-          } else {
-            stageImg.src = 'assets/acervo/pato-barbaro.jpg?v=3';
-            if (stageCaption) stageCaption.textContent = 'Patolino Bárbaro: o pato dos desenhos, de machado e armadura.';
-          }
-          stageImg.style.opacity = '1';
-          stageImg.style.transform = 'scale(1)';
-        }, 180);
-      }
+      stageImg.style.opacity = '0.3';
+      stageImg.style.transition = 'opacity 0.2s ease';
+      setTimeout(() => {
+        stageImg.src = slide.src;
+        stageImg.alt = slide.alt;
+        if (stageCaption) stageCaption.textContent = slide.caption;
+        stageImg.style.opacity = '1';
+      }, 160);
     });
   });
 }

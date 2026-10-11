@@ -2,7 +2,7 @@
 const PRODUCTS = [
   {
     id: 'pato-barbaro',
-    name: 'Patolino Bárbaro',
+    name: 'Pato Kratos',
     category: 'figures',
     categoryName: 'Figures',
     price: null,
@@ -14,7 +14,7 @@ const PRODUCTS = [
     infill: 'Estrutural',
     dimensions: 'Figure de estante',
     weight: 'Sob consulta',
-    description: 'Patolino, o pato clássico dos desenhos, em versão bárbara: armadura de couro, faixa vermelha e machado no ombro. Impresso e pintado à mão na oficina.',
+    description: 'Pato Kratos: o pato de machado, armadura de couro e faixa vermelha no rosto. Impresso e pintado à mão na oficina.',
     features: ['Personagem reconhecível de corpo inteiro', 'Machado e armadura pintados', 'Peça de estante, não é brinquedo articulado'],
     inStock: true
   },
