@@ -52,75 +52,45 @@ function formatBRL(value) {
 // ================= HERO STAGE =================
 
 function setupHeroStage() {
-  const stageImg = document.getElementById('hero-stage-image');
+  const frame = document.getElementById('hero-frame');
   const stageCaption = document.getElementById('hero-stage-caption');
   const lensButtons = document.querySelectorAll('.stage-lens-btn');
-  const slides = {
-    kratos: {
-      src: 'assets/acervo/pato-barbaro.jpg?v=3',
-      alt: 'Pato Kratos impresso em 3D',
-      caption: 'Pato Kratos: machado no ombro, armadura e a faixa vermelha.'
-    },
-    mega: {
-      src: 'assets/acervo/mega-charizard-x.jpg?v=3',
-      alt: 'Mega Charizard X impresso em 3D',
-      caption: 'Mega Charizard X, pintado à mão. Asas azuis, corpo negro e chama na cauda.'
-    },
-    gengar: {
-      src: 'assets/acervo/gengar-venom.jpg?v=3',
-      alt: 'Gengar Venom impresso em 3D',
-      caption: 'Gengar Venom: boca aberta, dentes brancos e a língua vermelha.'
-    },
-    cubo: {
-      src: 'assets/acervo/cubo-olhos.jpg?v=3',
-      alt: 'Cubo do Satoru Gojo impresso em 3D',
-      caption: 'O cubo que prende o Satoru Gojo, vermelho e coberto de olhos.'
-    },
-    furia: {
-      src: 'assets/acervo/furia-banguela.jpg?v=3',
-      alt: 'Fúria da Noite impressa em 3D',
-      caption: 'Fúria da Noite ao lado da Fúria da Luz.'
-    }
+  const captions = {
+    kratos: 'Pato Kratos: machado no ombro, armadura e a faixa vermelha.',
+    mega: 'Mega Charizard X, pintado à mão. Asas azuis, corpo negro e chama na cauda.',
+    gengar: 'Gengar Venom: boca aberta, dentes brancos e a língua vermelha.',
+    cubo: 'O cubo que prende o Satoru Gojo, vermelho e coberto de olhos.',
+    furia: 'Fúria da Noite ao lado da Fúria da Luz.'
   };
+
+  if (frame) {
+    frame.querySelectorAll('img').forEach((img) => { img.decoding = 'async'; });
+  }
 
   lensButtons.forEach(btn => {
     btn.addEventListener('click', () => {
-      const slide = slides[btn.dataset.mode];
-      if (!slide || !stageImg) return;
+      const mode = btn.dataset.mode;
+      if (!frame || !captions[mode]) return;
       lensButtons.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      stageImg.style.opacity = '0.3';
-      stageImg.style.transition = 'opacity 0.2s ease';
-      setTimeout(() => {
-        stageImg.src = slide.src;
-        stageImg.alt = slide.alt;
-        if (stageCaption) stageCaption.textContent = slide.caption;
-        stageImg.style.opacity = '1';
-      }, 160);
+      frame.querySelectorAll('.hero-slide').forEach((img) => {
+        img.classList.toggle('is-on', img.dataset.mode === mode);
+      });
+      if (stageCaption) stageCaption.textContent = captions[mode];
     });
   });
 }
 
 function setupScrollProgress() {
   const progressBar = document.getElementById('scroll-progress');
+  if (setupScrollProgress.bound) return;
+  setupScrollProgress.bound = true;
   window.addEventListener('scroll', () => {
     const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
     if (totalHeight > 0 && progressBar) {
       progressBar.style.width = `${(window.scrollY / totalHeight) * 100}%`;
     }
   }, { passive: true });
-
-  const revealEls = document.querySelectorAll('.reveal-on-scroll');
-  const observer = new IntersectionObserver((entries, obs) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('revealed');
-        obs.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.1 });
-
-  revealEls.forEach(el => observer.observe(el));
 }
 
 // ================= CATÁLOGO =================
@@ -135,14 +105,14 @@ function productShots(p) {
 }
 
 function shotStageHtml(shots, alt) {
-  const data = JSON.stringify(shots).replace(/'/g, '&#39;');
   const many = shots.length > 1;
   const firstLabel = shots[0].label ? `${shots[0].label} · 1/${shots.length}` : '';
+  const frames = shots.map((shot, i) =>
+    `<img class="${i === 0 ? 'is-on' : ''}" src="${shot.src}" alt="${alt}${shot.label ? ' — ' + shot.label : ''}" decoding="async">`
+  ).join('');
   return `
-    <div class="shot-stage" data-shots='${data}' data-index="0"
-      ontouchstart="this._sx=event.changedTouches[0].clientX"
-      ontouchend="swipeShot(event, this)">
-      <img src="${shots[0].src}" alt="${alt}" loading="lazy">
+    <div class="shot-stage" data-index="0">
+      ${frames}
       ${many ? `
         <button type="button" class="shot-nav prev" onclick="stepShot(event, this, -1)" aria-label="Foto anterior">‹</button>
         <button type="button" class="shot-nav next" onclick="stepShot(event, this, 1)" aria-label="Próxima foto">›</button>
@@ -158,18 +128,28 @@ function stepShot(e, el, dir) {
     e.preventDefault();
   }
   const stage = el.classList && el.classList.contains('shot-stage') ? el : el.closest('.shot-stage');
-  const shots = JSON.parse(stage.dataset.shots);
-  if (shots.length < 2) return;
+  const frames = stage.querySelectorAll('img');
+  if (frames.length < 2) return;
   let index = (Number(stage.dataset.index) || 0) + dir;
-  index = (index + shots.length) % shots.length;
+  index = (index + frames.length) % frames.length;
   stage.dataset.index = String(index);
-  stage.querySelector('img').src = shots[index].src;
+  frames.forEach((img, i) => img.classList.toggle('is-on', i === index));
   const label = stage.querySelector('.shot-label');
   if (label) {
-    label.textContent = shots[index].label
-      ? `${shots[index].label} · ${index + 1}/${shots.length}`
-      : `${index + 1}/${shots.length}`;
+    const name = (frames[index].alt.split(' — ')[1] || '').trim();
+    label.textContent = name ? `${name} · ${index + 1}/${frames.length}` : `${index + 1}/${frames.length}`;
   }
+}
+
+function bindSwipes(root = document) {
+  root.querySelectorAll('.shot-stage').forEach((stage) => {
+    if (stage.dataset.swipe) return;
+    stage.dataset.swipe = '1';
+    stage.addEventListener('touchstart', (e) => {
+      stage._sx = e.changedTouches[0].clientX;
+    }, { passive: true });
+    stage.addEventListener('touchend', (e) => swipeShot(e, stage));
+  });
 }
 
 function swipeShot(e, stage) {
@@ -217,7 +197,7 @@ function renderCatalog() {
     const waText = encodeURIComponent(`Olá! Quero encomendar na Pato Figures 3D: ${p.name}`);
     const wa = `https://wa.me/${CONFIG.whatsappNumber}?text=${waText}`;
     return `
-      <div class="editorial-card reveal-on-scroll" style="transition-delay: ${index * 50}ms;">
+      <div class="editorial-card">
         <div class="card-media" onclick="openFromCard(event, '${p.id}')">
           ${shotStageHtml(productShots(p), p.name)}
           <div style="position: absolute; top: 1rem; left: 1rem; z-index: 2;">
@@ -266,7 +246,7 @@ function renderCatalog() {
     `;
   }).join('');
 
-  setupScrollProgress();
+  bindSwipes();
 }
 
 function resetFilters() {
@@ -525,6 +505,7 @@ function openProductModal(productId) {
 
   modal.classList.remove('hidden');
   document.body.style.overflow = 'hidden';
+  bindSwipes(body);
 }
 
 function closeProductModal() {

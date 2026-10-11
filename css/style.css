@@ -61,6 +61,11 @@ body {
   transition: all 0.2s ease;
 }
 
+.nav-clean > .container {
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
 /* Botões Estilo Minimalista / Apple */
 .btn-primary {
   background-color: var(--text-main);
@@ -162,6 +167,17 @@ body {
   display: block;
 }
 
+.shot-stage img {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.12s linear;
+}
+
+.shot-stage img.is-on {
+  opacity: 1;
+}
+
 .shot-stage {
   position: relative;
   width: 100%;
@@ -223,6 +239,74 @@ body {
   position: relative;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.06);
 }
+
+.hero-frame {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: #ffffff;
+}
+
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #ffffff;
+  opacity: 0;
+  transition: opacity 0.16s ease;
+  pointer-events: none;
+}
+
+.hero-slide.is-on {
+  opacity: 1;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  min-width: 0;
+}
+
+.brand-mark {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  flex: none;
+}
+
+.brand-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.brand-name span { color: #ea580c; }
+
+.nav-desktop,
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.nav-desktop a,
+.wa-link {
+  color: #4b5563;
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.wa-link { color: #111827; }
+.wa-short { display: none; }
 
 .stage-switch {
   display: flex;
@@ -396,6 +480,15 @@ textarea:focus {
     grid-template-columns: 1fr;
   }
   .nav-desktop {
-    display: none !important;
+    display: flex !important;
+    flex-basis: 100%;
+    gap: 1.1rem;
+    padding-top: 0.1rem;
+  }
+  .wa-full { display: none; }
+  .wa-short { display: inline; }
+  .brand-name { font-size: 1rem; }
+  .nav-clean .container {
+    gap: 0.75rem;
   }
 }
