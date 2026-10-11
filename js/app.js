@@ -69,10 +69,10 @@ function setupHeroStage() {
 
         setTimeout(() => {
           if (mode === 'charizard') {
-            stageImg.src = 'assets/acervo/mega-charizard-x.jpg';
+            stageImg.src = 'assets/acervo/mega-charizard-x.jpg?v=2';
             if (stageCaption) stageCaption.textContent = 'Mega Charizard X, pintado à mão. Asas azuis, corpo negro e chama na cauda.';
           } else {
-            stageImg.src = 'assets/acervo/pato-barbaro.jpg';
+            stageImg.src = 'assets/acervo/pato-barbaro.jpg?v=2';
             if (stageCaption) stageCaption.textContent = 'Patolino Bárbaro: o pato dos desenhos, de machado e armadura.';
           }
           stageImg.style.opacity = '1';
@@ -107,6 +107,71 @@ function setupScrollProgress() {
 
 // ================= CATÁLOGO =================
 
+function productShots(p) {
+  if (Array.isArray(p.shots) && p.shots.length) {
+    return p.shots.map((shot) => ({ src: shot.src, label: shot.label || '' }));
+  }
+  const list = [{ src: p.image, label: '' }];
+  (p.gallery || []).forEach((src) => list.push({ src, label: '' }));
+  return list;
+}
+
+function shotStageHtml(shots, alt) {
+  const data = JSON.stringify(shots).replace(/'/g, '&#39;');
+  const many = shots.length > 1;
+  const firstLabel = shots[0].label ? `${shots[0].label} · 1/${shots.length}` : '';
+  return `
+    <div class="shot-stage" data-shots='${data}' data-index="0"
+      ontouchstart="this._sx=event.changedTouches[0].clientX"
+      ontouchend="swipeShot(event, this)">
+      <img src="${shots[0].src}" alt="${alt}" loading="lazy">
+      ${many ? `
+        <button type="button" class="shot-nav prev" onclick="stepShot(event, this, -1)" aria-label="Foto anterior">‹</button>
+        <button type="button" class="shot-nav next" onclick="stepShot(event, this, 1)" aria-label="Próxima foto">›</button>
+        <span class="shot-label">${firstLabel}</span>
+      ` : ''}
+    </div>
+  `;
+}
+
+function stepShot(e, el, dir) {
+  if (e) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
+  const stage = el.classList && el.classList.contains('shot-stage') ? el : el.closest('.shot-stage');
+  const shots = JSON.parse(stage.dataset.shots);
+  if (shots.length < 2) return;
+  let index = (Number(stage.dataset.index) || 0) + dir;
+  index = (index + shots.length) % shots.length;
+  stage.dataset.index = String(index);
+  stage.querySelector('img').src = shots[index].src;
+  const label = stage.querySelector('.shot-label');
+  if (label) {
+    label.textContent = shots[index].label
+      ? `${shots[index].label} · ${index + 1}/${shots.length}`
+      : `${index + 1}/${shots.length}`;
+  }
+}
+
+function swipeShot(e, stage) {
+  if (stage._sx == null) return;
+  const dx = e.changedTouches[0].clientX - stage._sx;
+  if (Math.abs(dx) < 40) return;
+  stage._swiped = true;
+  stepShot(e, stage, dx < 0 ? 1 : -1);
+}
+
+function openFromCard(e, id) {
+  if (e.target.closest('.shot-nav')) return;
+  const stage = e.currentTarget.querySelector('.shot-stage');
+  if (stage && stage._swiped) {
+    stage._swiped = false;
+    return;
+  }
+  openProductModal(id);
+}
+
 function renderCatalog() {
   const grid = document.getElementById('products-grid');
   if (!grid) return;
@@ -135,10 +200,9 @@ function renderCatalog() {
     const wa = `https://wa.me/${CONFIG.whatsappNumber}?text=${waText}`;
     return `
       <div class="editorial-card reveal-on-scroll" style="transition-delay: ${index * 50}ms;">
-        <div class="card-media" style="cursor: pointer;" onclick="openProductModal('${p.id}')">
-          <img src="${p.image}" alt="${p.name}" loading="lazy">
-          
-          <div style="position: absolute; top: 1rem; left: 1rem;">
+        <div class="card-media" onclick="openFromCard(event, '${p.id}')">
+          ${shotStageHtml(productShots(p), p.name)}
+          <div style="position: absolute; top: 1rem; left: 1rem; z-index: 2;">
             <span style="background: rgba(255,255,255,0.92); backdrop-filter: blur(8px); padding: 0.3rem 0.65rem; border-radius: 4px; font-size: 0.72rem; font-weight: 600; color: #111827; letter-spacing: 0.03em;">
               ${p.badge}
             </span>
@@ -376,17 +440,16 @@ function openProductModal(productId) {
 
   const consult = product.price == null;
   const pixPrice = consult ? null : product.price * (1 - (CONFIG.pixDiscountPercent || 5) / 100);
-  const shots = [product.image].concat(product.gallery || []);
+  const shots = productShots(product);
   const waText = encodeURIComponent(`Olá! Quero encomendar na Pato Figures 3D: ${product.name}`);
   const wa = `https://wa.me/${CONFIG.whatsappNumber}?text=${waText}`;
 
   body.innerHTML = `
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2.5rem;">
       <div>
-        <div style="border-radius: 8px; overflow: hidden; border: 1px solid #e5e7eb; margin-bottom: 0.75rem; background: #f4f1ec;">
-          <img id="modal-shot" src="${product.image}" alt="${product.name}" style="width: 100%; aspect-ratio: 1/1; object-fit: contain; background: #f4f1ec; display: block;">
+        <div style="border-radius: 8px; overflow: hidden; border: 1px solid #e5e7eb; background: #ffffff;">
+          ${shotStageHtml(shots, product.name)}
         </div>
-        ${shots.length > 1 ? `<div style="display: flex; gap: 0.5rem;">${shots.map((src) => `<button type="button" onclick="document.getElementById('modal-shot').src='${src}'" style="padding: 0; border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden; width: 68px; height: 68px; background: #f4f1ec; cursor: pointer;"><img src="${src}" alt="" style="width: 100%; height: 100%; object-fit: contain;"></button>`).join('')}</div>` : ''}
       </div>
 
       <div style="display: flex; flex-direction: column;">

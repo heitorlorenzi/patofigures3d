@@ -149,19 +149,69 @@ body {
   aspect-ratio: 1 / 1;
   overflow: hidden;
   position: relative;
-  background-color: #f4f1ec;
+  background-color: #ffffff;
+  cursor: pointer;
 }
 
-.card-media img {
+.card-media img,
+.shot-stage img {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  background-color: #f4f1ec;
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  background-color: #ffffff;
+  display: block;
 }
 
-.editorial-card:hover .card-media img {
-  transform: scale(1.05);
+.shot-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #ffffff;
+}
+
+.card-media .shot-stage {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+.shot-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: rgba(255, 255, 255, 0.94);
+  color: #111827;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.shot-nav.prev { left: 0.65rem; }
+.shot-nav.next { right: 0.65rem; }
+
+.shot-label {
+  position: absolute;
+  left: 50%;
+  bottom: 0.75rem;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.94);
+  color: #111827;
+  border-radius: 999px;
+  padding: 0.28rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 3;
+  white-space: nowrap;
 }
 
 /* Hero Interactive Stage */
