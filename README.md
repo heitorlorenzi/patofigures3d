@@ -1,6 +1,6 @@
-# 🦆 PatoFigures3D - Loja & Catálogo de Impressão 3D FDM
+# 🦆 Pato 3D - Loja & Catálogo de Impressão 3D FDM
 
-Plataforma oficial da **PatoFigures3D**, desenvolvida para apresentar seu trabalho com padrão de estúdio profissional e converter visitantes em clientes.
+Plataforma oficial da **Pato 3D**, desenvolvida para apresentar seu trabalho com padrão de estúdio profissional e converter visitantes em clientes.
 
 ---
 
@@ -54,7 +54,7 @@ Todas as configurações da loja estão centralizadas no topo do arquivo `js/pro
 
 ```javascript
 const CONFIG = {
-  brandName: 'Pato Figures 3D',
+  brandName: 'Pato 3D',
   tagline: 'Action Figures & Soluções em Impressão 3D FDM',
   pixKey: 'patofigures3d@gmail.com',        // Chave PIX oficial
   pixDiscountPercent: 5,                   // Desconto no PIX (%)
